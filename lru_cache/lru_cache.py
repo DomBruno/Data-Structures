@@ -1,3 +1,9 @@
+import sys
+sys.path.append('./doubly_linked_list')
+from doubly_linked_list import DoublyLinkedList
+from collections import OrderedDict
+
+
 class LRUCache:
     """
     Our LRUCache class keeps track of the max number of nodes it
@@ -7,7 +13,10 @@ class LRUCache:
     to every node stored in the cache.
     """
     def __init__(self, limit=10):
-        pass
+        self.limit = limit
+        self.order = DoublyLinkedList()
+        self.storage = OrderedDict()
+        self.size = self.order.length
 
     """
     Retrieves the value associated with the given key. Also
@@ -17,7 +26,11 @@ class LRUCache:
     key-value pair doesn't exist in the cache.
     """
     def get(self, key):
-        pass
+        if key not in self.storage:
+            return None
+        else:
+            self.storage.move_to_end(key, last=False)
+            return self.storage[key]
 
     """
     Adds the given key-value pair to the cache. The newly-
@@ -30,4 +43,35 @@ class LRUCache:
     the newly-specified value.
     """
     def set(self, key, value):
-        pass
+        if key in self.storage:
+            node = self.order.head
+            incr = 0
+            while incr < self.order.length:
+                incr += 1
+                if {key: value} == node.value:
+                    self.order.delete(node)
+                    self.order.add_to_head(node)
+                    incr = self.order.length + 1
+
+            self.storage.update({key: value})
+            self.storage.move_to_end(key, last=False)
+
+        elif self.size < self.limit:
+            
+            self.order.add_to_head(value)
+            self.size = self.order.length
+            self.storage.update({key: value})
+            self.storage.move_to_end(key, last=False)
+
+        elif self.size >= self.limit:
+            self.order.add_to_head(value)
+            self.order.remove_from_tail()
+
+            self.size = self.order.length
+
+            # add the key to the dict
+            # move it to the front
+            # delete the last item
+            self.storage.update({key: value})
+            self.storage.move_to_end(key, last=False)
+            self.storage.popitem(last=True)
