@@ -69,9 +69,6 @@ class LRUCache:
 
             self.size = self.order.length
 
-            # add the key to the dict
-            # move it to the front
-            # delete the last item
             self.storage.update({key: value})
             self.storage.move_to_end(key, last=False)
             self.storage.popitem(last=True)
